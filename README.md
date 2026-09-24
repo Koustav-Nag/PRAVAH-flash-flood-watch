@@ -257,8 +257,7 @@ The API will be available at `http://localhost:8000`.
 ### Running the Frontend
 
 ```bash
-cd frontend
-npm run dev
+cd frontend && npm run dev
 ```
 
 Open `http://localhost:5173`. The dashboard expects the backend running at `http://localhost:8000` (override with `VITE_API_BASE` env var).

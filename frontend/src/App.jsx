@@ -109,7 +109,7 @@ export default function App() {
     <div className="app">
       <aside className="sidebar">
         <div className="masthead">
-          <h1>Sonitpur Flash Flood Watch</h1>
+          <h1>PRAVAH - Flash Flood Early Warning System</h1>
           <p>Multi-source early warning — hilly-terrain pilot</p>
         </div>
 
