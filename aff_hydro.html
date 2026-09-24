@@ -1,0 +1,891 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" defer></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js" defer></script>
+
+<style>
+:root {
+  --brand-blue: #0B5ED7;
+  --muted-bg: #f7f8fb;
+  --content-max-width: 1100px;
+}
+
+html, body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--muted-bg);
+  color: #222;
+}
+
+/* Header */
+.site-header {
+  background: linear-gradient(90deg, var(--brand-blue), #0a63b8);
+  color: #fff;
+  padding: .35rem 0;
+}
+
+.site-header img {
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+.site-header,.nav-bg {
+  overflow-x: clip;   /* modern & safer than hidden */
+}
+
+
+
+.scroll-x {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-container,
+.content-wrap {
+  max-width: 100%;
+  overflow-x: visible;
+}
+
+
+
+.logo-img {
+  height: 42px;
+  width: auto;
+}
+
+/* Ticker */
+.ticker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.ticker {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.ticker__move {
+  white-space: nowrap;              /* 🔑 prevents line breaks */
+  display: inline-block;
+  padding-left: 100%;
+  animation: ticker 18s linear infinite;
+  font-weight: 700;
+  font-size: .95rem;
+  will-change: transform;
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+
+
+
+
+/* Navigation */
+.nav-bg {
+  background: #fff;
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.nav .nav-link {
+  color: #333;
+}
+
+.nav .nav-link.active {
+  font-weight: 600;
+  color: var(--brand-blue);
+}
+
+/* Page content wrapper */
+.page-container {
+  padding: 0.5rem 0.75rem;
+}
+
+.content-wrap {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+/* Images */
+img.resp {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #e8e8ee;
+  padding: .25rem;
+  background: #fff;
+  border-radius: 6px;
+}
+
+/* Justified text */
+.page-container p {
+   text-align: justify;
+  text-justify: inter-word;
+  word-spacing: normal;
+}
+
+
+.logo-wrap {
+  flex: 0 0 auto;      /* 🔑 do not shrink */
+  min-width: 42px;     /* guarantees visibility */
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile offcanvas width override */
+.offcanvas-start {
+  --bs-offcanvas-width: 250px;   /* adjust as needed */
+}
+
+.offcanvas {
+  background: linear-gradient(180deg,#f7fbff,#eef4ff,#fff);
+}
+
+.offcanvas-header {background: linear-gradient(
+    90deg,#0B5ED7,#0a63b8);
+  color: #fff;
+}
+
+.offcanvas-header .btn-close {
+  filter: invert(1);   /* makes close icon white */
+}
+.offcanvas .nav-link {
+  color: #0b3d91;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.offcanvas .nav-link:hover,
+.offcanvas .nav-link.active {
+  background: rgba(11, 94, 215, 0.1);
+  color: #0B5ED7;
+}
+
+.offcanvas hr {
+  border-color: rgba(0,0,0,0.1);
+}
+
+.offcanvas .small {
+  color: #555;
+}
+
+.info-box a {
+  text-decoration: none;
+  color: #0B5ED7;
+}
+.info-box a:hover {
+  text-decoration: underline;
+}
+
+.info-box {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+/* Mobile */
+@media (max-width: 420px) {
+  .logo-img { height: 36px; }
+  .ticker__move { font-size: .9rem; animation-duration: 20s; }
+}
+
+@media (max-width: 420px) {
+  .site-header .d-flex {
+    gap: .25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .ticker-wrap {
+    flex: 1 1 auto;
+    min-width: 0;      /* allows ticker to shrink instead */
+  }
+  
+  .logo-wrap {
+    min-width: 34px;     /* reduce from 42px */
+    padding-right: 0;   /* remove any residual spacing */
+    padding-left: 0;
+  }
+  
+  .site-header .container-fluid {
+    padding-left: .25rem;
+    padding-right: .25rem;
+  }
+  
+   .logo-wrap:first-child {
+    margin-right: .25rem;
+  }
+  .logo-wrap:last-child {
+    margin-left: .25rem;
+  }
+  
+  
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container-fluid">
+    <div class="d-flex align-items-center justify-content-between">
+		<!-- Mobile hamburger -->
+	<button class="btn btn-link d-md-none me-2"
+		data-bs-toggle="offcanvas"
+		data-bs-target="#mobileNav"
+		aria-label="Open navigation">
+	☰
+	</button>
+	
+	
+	
+	  <div class="logo-wrap">
+        <img src="/images/emblem.png" alt="CWC Emblem" class="logo-img">
+	</div>
+	
+     
+      <div class="flex-fill text-center ticker-wrap">
+        <div class="ticker">
+          <div class="ticker__move">
+            CENTRAL WATER COMMISSION - ADVISORY FLOOD FORECAST
+          </div>
+        </div>
+      </div>
+
+      
+		<div class="logo-wrap text-end">
+			<img src="/images/cwclogo.gif" alt="CWC Logo" class="logo-img">
+		</div>
+
+    </div>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav class="nav-bg">
+	<div class="container-fluid">
+		<div class="d-flex align-items-center py-1">
+			<!-- Navigation -->
+			<div class="collapse d-md-flex flex-grow-1" id="mainNav">
+				<ul class="nav nav-pills flex-column flex-md-row">
+
+					<li class="nav-item"><a class="nav-link" href="home.php">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="inundation.php">Inundation</a></li>
+					<li class="nav-item"><a class="nav-link" href="method.php">Methodology</a></li>
+					<li class="nav-item"><a class="nav-link" href="hydro.php">Forecast-Hydrograph</a></li>
+					<li class="nav-item"><a class="nav-link" href="table.php">Tabular-View</a></li>
+					<li class="nav-item"><a class="nav-link" href="contact.php">Contact Us</a></li>
+					<li class="nav-item"><a class="nav-link" href="otherportal.php">Other Forecast Portals</a></li>
+					
+					<!-- Mobile-only info -->
+					<li class="nav-item d-md-none mt-2 pt-2 border-top small text-muted">
+					<div>Last model run: 2026-09-23 21:45</div>
+										</li>
+
+				</ul>
+			</div>
+
+			<!-- Desktop-only info (right aligned) -->
+			<div class="ms-auto d-none d-md-flex align-items-center gap-3 small text-muted">
+				<div>Last model run: 2026-09-23 21:45</div>
+					
+			</div>
+
+		</div>
+	</div>
+
+
+</nav>
+<!-- Mobile Left-Side Navigation (Offcanvas) -->
+<div class="offcanvas offcanvas-start d-md-none"
+     tabindex="-1"
+     id="mobileNav"
+     aria-labelledby="mobileNavLabel">
+
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileNavLabel">Menu</h5>
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <ul class="nav flex-column nav-pills gap-1">
+      <li class="nav-item"><a class="nav-link" href="home.php">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="inundation.php">Inundation</a></li>
+      <li class="nav-item"><a class="nav-link" href="method.php">Methodology</a></li>
+      <li class="nav-item"><a class="nav-link" href="hydro.php">Forecast-Hydrograph</a></li>
+      <li class="nav-item"><a class="nav-link" href="table.php">Tabular-View</a></li>
+      <li class="nav-item"><a class="nav-link" href="contact.php">Contact Us</a></li>
+	  <li class="nav-item"><a class="nav-link" href="otherportal.php">Other Forecast Portals</a></li>
+					
+				
+		
+		
+    </ul>
+
+    <hr>
+
+    <div class="small text-muted">
+      Last model run: 2026-09-23 21:45<br>
+      
+		  
+    </div>
+  </div>
+</div><script>document.title = "Forecast-Hydrograph - CWC AFF";</script>
+
+<style>
+
+/* =========================================================
+   ROOT / BASE
+   ========================================================= */
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px;
+}
+
+
+/* =========================================================
+   FLEX LAYOUT
+   ========================================================= */
+
+.container-flex {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   LEFT PANEL (CONTROLS)
+   ========================================================= */
+
+.left-panel {
+    width: 420px;
+    min-width: 300px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+
+/* =========================================================
+   RIGHT PANEL (GRAPH + TABLE)
+   ========================================================= */
+
+/* Desktop-only width constraint */
+@media (min-width: 1101px) {
+    .right-panel {
+        min-width: 900px;
+    }
+}
+
+.right-panel {
+    flex: 1 1 auto;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+
+/* =========================================================
+   FORM CONTROLS
+   ========================================================= */
+
+.select-label {
+    display: block;
+    font-weight: 700;
+    color: #1025D3;
+    margin-bottom: 6px;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #cfd8e3;
+    border-radius: 6px;
+    background: #fbfdff;
+    font-size: 14px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.radio-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+
+/* =========================================================
+   GRAPH / IMAGE AREA
+   ========================================================= */
+
+#fooBar {
+    width: 100%;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;   /* desktop */
+    background: #f8fafc;
+    border-radius: 6px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Ensure images can scroll horizontally */
+#fooBar img {
+    width: 100%;          /* fit container initially */
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Mobile: start graph from LEFT */
+@media (max-width: 768px) {
+    #fooBar {
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+	
+	#fooBar img {
+        max-width: none;  /* allow zoom expansion */
+        min-width: 100%;
+    }
+}
+
+
+/* =========================================================
+   TIMESERIES TABLE
+   ========================================================= */
+
+#timeseries {
+    margin-top: 12px;
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 0;
+}
+
+#timeseries table {
+    border-collapse: collapse;
+    width: auto;
+    min-width: 260px;
+    max-width: 640px;
+    margin: 6px auto;
+    font-size: 13px;
+}
+
+#timeseries th,
+#timeseries td {
+    padding: 6px 8px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Sticky header (no jump) */
+#timeseries th {
+    position: sticky;
+    top: 0;
+    background: #f1f5f9;
+    font-weight: 700;
+    z-index: 2;
+}
+
+
+/* =========================================================
+   METADATA
+   ========================================================= */
+
+#metadata {
+    margin-top: 12px;
+    background: #f7fbff;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #e6f0ff;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.button-like {
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    padding: 9px;
+    border-radius: 6px;
+}
+
+
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
+
+#disclaimer-bar {
+    margin-top: 16px;
+    background: #fff8f0;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ffedd5;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   VISITOR COUNTER
+   ========================================================= */
+
+#visitorCounter {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   RESPONSIVE STACKING
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .container-flex {
+        flex-direction: column;
+    }
+
+    .left-panel,
+    .right-panel {
+        width: 100%;
+    }
+
+    .left-panel {
+        order: 1;
+    }
+
+    .right-panel {
+        order: 2;
+        min-width: 0;   /* CRITICAL: remove desktop constraint */
+    }
+
+    #disclaimer-bar {
+        order: 3;
+    }
+}
+
+
+
+</style>
+<div class="page-container">
+  <div class="container-flex">
+    <aside class="left-panel" aria-label="Controls">
+      <div>
+        <div style="margin-bottom:8px; font-weight:700; color:#1025D3; font-size:16px;">For Flood hydrograph</div>
+        <div style="margin-bottom:8px; color:#1025D3; font-weight:700;">Select Basin or State</div>
+
+		<div class="radio-row" role="radiogroup" aria-label="Choose filter type">
+		<label style="font-weight:600;"><input type="radio" name="filterType" value="basin"> &nbsp;Basin</label>
+		<label style="font-weight:600;"><input type="radio" name="filterType" value="state" checked> &nbsp;State</label>
+		</div>
+
+        <div style="margin-top:6px;">
+          <select id="basinDropdown" class="form-control-custom" style="display:none;"></select>
+        </div>
+
+        <div style="margin-top:10px;">
+          <select id="stateDropdown" class="form-control-custom" style="display:none;"></select>
+        </div>
+
+		<div style="margin-top:10px;">
+		<label class="select-label">Station Type</label>
+		<select id="typeDropdown" class="form-control-custom">
+			<option value="ALL">All Types</option>
+			<option value="Level" selected>Level</option>
+			<option value="Inflow">Inflow</option>
+		</select>
+		</div>
+
+
+
+        <div style="margin-top:10px;">
+          <label class="select-label">Station</label>
+          <select id="stationDropdown" class="form-control-custom"><option value="">Select Station</option></select>
+        </div>
+
+        <div id="metadata" aria-live="polite"></div>
+
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <div id="downloadCSV" class="button-like form-control-custom" style="display:none; background:#e6f0ff; border:1px solid #c8ddff;">Download Time Series CSV</div>
+        </div>
+
+      </div>
+    </aside>
+
+    <section class="right-panel">
+      <div id="fooBar" aria-live="polite">Select a station to view hydrograph</div>
+
+      <div id="timeseries" role="table" aria-label="Time series table"></div>
+
+      <div id="visitorCounter">
+        You are visitor no: 1420      </div>
+
+    </section>
+  </div>
+
+  <div id="disclaimer-bar" role="note">
+    <strong>Disclaimer:</strong>
+    <ol style="margin:6px 0 0 18px; padding:0;">
+      <li>The purpose of this web portal is to sensitize all the stakeholders about Flood Situation in the country on real-time.</li>
+      <li>Flood Forecast may be subject to uncertainty in rainfall forecast, lack of information on reservoir releases, Drainage congestion, measurement process during floods and other unknown factors.</li>
+      <li>Department has no responsibility or liability for any errors or omissions in the content of this web portal.</li>
+      <li>For further queries, the Flood Control Room of Central Water Commission shall be contacted at E-mail: fmdte@nic.in.</li>
+      <li>Background map does not depict political boundary.</li>
+      <li>Flood Forecast is updated every 3 hours. So in case of Flood like situation, it is advisable to view the Flood Forecast regularly.</li>
+    </ol>
+  </div>
+</div>
+
+
+<div id="imageModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); cursor:zoom-out; align-items:center; justify-content:center;">
+  <img id="modalImage" style="max-width:95%; max-height:95%; background:#fff; padding:10px; border-radius:4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function(){
+    // Data holders
+    const stations = {};
+    const basins = new Set();
+    const states = new Set();
+	
+	// --- NEW: Modal click-to-close logic ---
+    const modal = document.getElementById('imageModal');
+    modal.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+	function fetchCSV() {
+        fetch('/textdata/All_Station_Basin.csv?t=' + new Date().getTime())
+            .then(response => response.text())
+            .then(csvText => {
+                const rows = csvText.trim().split('\n');
+                if (rows.length < 2) return; // Exit if CSV is empty or only has headers
+
+                // 1. Read headers and standardize them to lowercase for easy matching
+                const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+                
+                // 2. Find column indices dynamically by name
+                // This makes it immune to column reordering or new columns being added
+                const iStation = headers.findIndex(h => h.includes('station'));
+                const iState = headers.findIndex(h => h.includes('state'));
+                const iBasin = headers.findIndex(h => h.includes('basin'));
+                const iType = headers.findIndex(h => h.includes('type'));
+
+                rows.slice(1).forEach(row => {
+                    const cols = row.split(',');
+                    
+                    // 3. Map data using the dynamic indices (with fallbacks just in case)
+                    const station = (cols[iStation >= 0 ? iStation : 0] || '').trim();
+                    const state = (cols[iState >= 0 ? iState : 1] || '').trim();
+                    const basinRaw = (cols[iBasin >= 0 ? iBasin : 2] || '').trim();
+                    const type = (cols[iType >= 0 ? iType : 3] || '').trim();
+
+                    if (station) {
+                        let basinName = basinRaw.toUpperCase().replace(/\s*BASIN\s*$/i, '').trim();
+                        stations[station] = { state: state, basin: basinName, type: type };
+                        if (state) states.add(state);
+                        if (basinName) basins.add(basinName);
+                    }
+                });
+                
+                populateDropdown('stateDropdown', Array.from(states).sort());
+                populateDropdown('basinDropdown', Array.from(basins).sort());
+
+                // 4. Initialize defaults once data is loaded
+                initializeDefaultView();
+            })
+            .catch(err => console.error('CSV fetch error', err));
+    }
+
+    function initializeDefaultView() {
+        // Ensure UI displays the State dropdown and hides the Basin dropdown
+        document.getElementById('basinDropdown').style.display = 'none';
+        document.getElementById('stateDropdown').style.display = 'block';
+
+        // Select "ALL" for State to generate a complete list of Level stations initially
+        const stateDropdown = document.getElementById('stateDropdown');
+        if(stateDropdown.querySelector('option[value="ALL"]')) {
+            stateDropdown.value = 'ALL';
+        }
+
+        // Populate the station dropdown based on these defaults
+        updateStations();
+
+        // Select the first actual station (index 1, since index 0 is "Select Station")
+        const stationDropdown = document.getElementById('stationDropdown');
+        if (stationDropdown.options.length > 1) {
+            stationDropdown.selectedIndex = 1;
+            // Manually trigger the change event to load the image and time series data
+            stationDropdown.dispatchEvent(new Event('change'));
+        }
+    }
+
+    function populateDropdown(id, items) {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+        const dflt = document.createElement('option'); dflt.value=''; dflt.text='Select'; el.appendChild(dflt);
+        const all = document.createElement('option'); all.value='ALL'; all.text='Select All'; el.appendChild(all);
+        items.forEach(i => { const o=document.createElement('option'); o.value=i; o.text=i; el.appendChild(o); });
+    }
+
+    function updateStations() {
+        const stationDropdown = document.getElementById('stationDropdown');
+        stationDropdown.innerHTML = '<option value="">Select Station</option>';
+
+        const radioMode = document.querySelector('input[name="filterType"]:checked');
+        if (!radioMode) return;
+
+        const filterType = radioMode.value; // 'basin' or 'state'
+        const geoValue = filterType === 'basin' ? document.getElementById('basinDropdown').value : document.getElementById('stateDropdown').value;
+        const typeValue = document.getElementById('typeDropdown').value;
+
+        if (!geoValue) return;
+
+        const matched = Object.keys(stations).filter(s => {
+            const st = stations[s];
+            const geoMatch = (geoValue === 'ALL' || st[filterType] === geoValue);
+            const typeMatch = (typeValue === 'ALL' || (st.type && st.type.toLowerCase() === typeValue.toLowerCase()));
+            
+            return geoMatch && typeMatch;
+        });
+
+        matched.sort((a,b)=>a.localeCompare(b));
+        matched.forEach(s => { const o=document.createElement('option'); o.value=s; o.text=s; stationDropdown.appendChild(o); });
+    }
+
+    // Event Listeners for Filters
+    document.querySelectorAll('input[name="filterType"]').forEach(r => r.addEventListener('change', function(){
+        const val = this.value;
+        if (val === 'basin') {
+            document.getElementById('basinDropdown').style.display='block';
+            document.getElementById('stateDropdown').style.display='none';
+        } else {
+            document.getElementById('basinDropdown').style.display='none';
+            document.getElementById('stateDropdown').style.display='block';
+        }
+        updateStations();
+        
+        // Optional: clear station view when toggling radio buttons
+        clearFooBar(); 
+        document.getElementById('downloadCSV').style.display='none'; 
+        document.getElementById('metadata').innerHTML=''; 
+        document.getElementById('timeseries').innerHTML='';
+    }));
+
+    document.getElementById('basinDropdown').addEventListener('change', updateStations);
+    document.getElementById('stateDropdown').addEventListener('change', updateStations);
+    document.getElementById('typeDropdown').addEventListener('change', updateStations);
+
+    // Image and timeseries loader
+    function clearFooBar() { const fb=document.getElementById('fooBar'); fb.innerHTML='Select a station to view hydrograph'; }
+    function updateImageAndData(station) {
+        const fb = document.getElementById('fooBar'); 
+        fb.innerHTML = '';
+        
+        // Create the image
+        const img = document.createElement('img');
+        img.className = 'resize_horizontal';
+        img.alt = station + ' hydrograph';
+        img.src = '/image/' + encodeURIComponent(station.toUpperCase()) + '.png';
+        img.loading = 'lazy';
+        
+        // NEW: Make it look clickable and add the click event to open the modal
+        img.style.cursor = 'zoom-in';
+        img.title = 'Click to enlarge';
+        img.addEventListener('click', function() {
+            document.getElementById('modalImage').src = this.src;
+            document.getElementById('imageModal').style.display = 'flex';
+        });
+
+		
+        img.onerror = function(){ fb.innerHTML='(No hydrograph image available)'; };
+        fb.appendChild(img);
+
+        // load data file
+        loadStationData(station);
+    }
+
+    document.getElementById('stationDropdown').addEventListener('change', function(){
+        const station = this.value;
+        if (!station) { clearFooBar(); document.getElementById('downloadCSV').style.display='none'; document.getElementById('metadata').innerHTML=''; document.getElementById('timeseries').innerHTML=''; return; }
+        updateImageAndData(station);
+        document.getElementById('downloadCSV').style.display='inline-block';
+    });
+
+    // Timeseries loader
+    const selectedMetadata = { 'WarningLevel': 'Warning Level (m)', 'DangerLevel': 'Danger Level (m)', 'HFL': 'Highest Flood Level (m)', 'Latitude': 'Lat', 'Longitude': 'Long', 'TOF': 'Time of Forecast' };
+    const allowedTimeSeriesCols = { 'Date': 'Date', 'AFF': 'Forecast' };
+
+    function loadStationData(stationName) {
+        const suffixes = ['-W.txt','-I.txt'];
+        function tryFile(idx){
+            if (idx>=suffixes.length) { document.getElementById('metadata').innerHTML=''; document.getElementById('timeseries').innerHTML=''; return; }
+            const url='/Timeseries/'+stationName+suffixes[idx];
+            fetch(url).then(r=>{ if(!r.ok) throw new Error('NF'); return r.text(); }).then(text=>{
+                const lines = text.trim().split('\n'); if (lines.length<2) { document.getElementById('timeseries').innerHTML=''; return; }
+                const headers = lines[0].split(',').map(h=>h.trim()); const firstRow = lines[1].split(',').map(v=>v.trim());
+                // metadata
+                let html='<ul style=\"margin:0; padding-left:18px;\">'; headers.forEach((h,i)=>{ if (selectedMetadata[h]) html+='<li><strong>'+selectedMetadata[h]+'</strong>: '+(firstRow[i]||'')+'</li>'; }); html+='</ul>';
+                document.getElementById('metadata').innerHTML=html;
+                // timeseries
+                const allowedIdx = headers.map((h,i)=> allowedTimeSeriesCols[h]?i:-1).filter(i=>i!==-1);
+                const renamed = headers.filter(h=>allowedTimeSeriesCols[h]).map(h=>allowedTimeSeriesCols[h]);
+                const table=document.createElement('table'); table.style.width='100%';
+                const thead=table.createTHead(); const hr=thead.insertRow(); renamed.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; hr.appendChild(th); });
+                const tb=table.createTBody(); for(let i=1;i<lines.length;i++){ const row=tb.insertRow(); const cols=lines[i].split(','); allowedIdx.forEach(idx=>{ const td=row.insertCell(); td.textContent=(cols[idx]||''); td.style.padding='6px 8px'; }); }
+                const ts=document.getElementById('timeseries'); ts.innerHTML=''; ts.appendChild(table);
+            }).catch(()=>tryFile(idx+1));
+        }
+        tryFile(0);
+    }
+
+    document.getElementById('downloadCSV').addEventListener('click', function(){ const table=document.querySelector('#timeseries table'); if(!table){ alert('No time series data to download.'); return; } let csv=''; Array.from(table.querySelectorAll('tr')).forEach(r=>{ const cols=Array.from(r.querySelectorAll('th, td')).map(c=>'\"'+c.innerText.trim()+'\"'); csv+=cols.join(',')+'\n'; }); const station=document.getElementById('stationDropdown').value||'station'; const safe=station.replace(/[^\w\-]/g,'_'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download='time_series_'+safe+'.csv'; document.body.appendChild(link); link.click(); document.body.removeChild(link); });
+
+    // Initial fetch
+    fetchCSV();
+
+});
+</script>

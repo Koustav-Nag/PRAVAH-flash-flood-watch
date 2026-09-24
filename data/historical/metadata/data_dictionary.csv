@@ -1,0 +1,51 @@
+column_name,description,unit,data_type,source,calculation_method,missing_value_definition
+timestamp,Observation or event timestamp,YYYY-MM-DD HH:MM:SS,datetime,varies by file,n/a,empty cell = missing
+station_id,Rainfall gauge/station identifier,n/a,string,rainfall provider,n/a,empty cell = no station recorded
+gauge_location,River/hydrological gauge name,n/a,string,CWC/Assam WRD,n/a,empty cell = unknown gauge
+latitude,Observation latitude (WGS84),degrees,float,varies by file,n/a,empty cell = missing
+longitude,Observation longitude (WGS84),degrees,float,varies by file,n/a,empty cell = missing
+rainfall_mm,Raw rainfall observation,mm,float,rainfall provider,as reported by source,empty cell = not measured/not reported
+rainfall_1h,Rolling 1-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 1h window,null if underlying raw data incomplete for the window
+rainfall_3h,Rolling 3-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 3h window,null if underlying raw data incomplete for the window
+rainfall_6h,Rolling 6-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 6h window,null if underlying raw data incomplete for the window
+rainfall_12h,Rolling 12-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 12h window,null if underlying raw data incomplete for the window
+rainfall_24h,Rolling 24-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 24h window,null if underlying raw data incomplete for the window
+rainfall_48h,Rolling 48-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 48h window,null if underlying raw data incomplete for the window
+rainfall_72h,Rolling 72-hour rainfall accumulation,mm,float,calculated,sum of rainfall_mm over trailing 72h window,null if underlying raw data incomplete for the window
+river_level,Observed river/gauge water level,m,float,CWC/Assam WRD,as reported by source,empty cell = no reading available (never estimated)
+river_level_change_1h,Change in river_level over trailing 1h,m,float,calculated,river_level(t) - river_level(t-1h),null if either endpoint is missing
+river_level_change_3h,Change in river_level over trailing 3h,m,float,calculated,river_level(t) - river_level(t-3h),null if either endpoint is missing
+river_level_change_6h,Change in river_level over trailing 6h,m,float,calculated,river_level(t) - river_level(t-6h),null if either endpoint is missing
+distance_to_danger_level,river_level minus the gauge's official danger level,m,float,calculated,river_level - danger_level_m (from river_danger_levels_assam.csv),null if river_level or danger level unknown
+river_discharge,Observed river discharge,cumecs,float,CWC/Assam WRD,as reported by source,empty cell = not measured/not reported
+danger_level_m,Official danger level for the gauge,m,float,Assam WRD danger-level table,as published,n/a - static reference value
+soil_moisture,Soil moisture observation/estimate,fraction or index (source-dependent),float,satellite/model (specify per row),as reported by source,empty cell = not available
+temperature,Air temperature,deg C,float,IMD/reanalysis (specify per row),as reported by source,empty cell = not available
+vegetation_index,Vegetation index (e.g. NDVI),unitless index,float,satellite (specify per row),as reported by source,empty cell = not available
+evapotranspiration,Evapotranspiration estimate,mm,float,satellite/model (specify per row),as reported by source,empty cell = not available
+surface_water,Surface water fraction/extent,fraction,float,satellite (specify per row),as reported by source,empty cell = not available
+elevation,Terrain elevation,m,float,DEM (specify: SRTM/ASTER),from DEM at location,n/a - static
+slope,Terrain slope,degrees,float,DEM-derived,computed from DEM,n/a - static
+aspect,Terrain aspect (slope direction),degrees,float,DEM-derived,computed from DEM,n/a - static
+flow_accumulation,Hydrological flow accumulation,unitless (cell count or proxy),float,DEM/HydroSHEDS-derived,computed from conditioned DEM,n/a - static
+distance_to_river,Distance to nearest river/high-flow-accumulation cell,km,float,DEM-derived,computed from flow accumulation raster,n/a - static
+drainage_density,Local drainage density proxy,unitless (0-1 normalized),float,DEM-derived,computed from flow accumulation raster,n/a - static
+topographic_wetness_index,Topographic wetness index,unitless,float,DEM-derived,ln(flow_accumulation / tan(slope)),n/a - static; null where slope = 0
+land_cover,Land cover classification,categorical,string,satellite classification (specify source),as classified,empty cell = not classified
+event_id,Foreign key linking a row to a flood_events.csv record,n/a,string,internal,assigned during event compilation,null/empty for non-flood-period observations
+flood_start,Flood event start timestamp,YYYY-MM-DD HH:MM:SS,datetime,ASDMA/Assam WRD/CWC/NRSC (record actual source used),as reported by source,empty cell = unknown
+flood_end,Flood event end timestamp,YYYY-MM-DD HH:MM:SS,datetime,ASDMA/Assam WRD/CWC/NRSC (record actual source used),as reported by source,empty cell = unknown
+affected_area,Area affected by the flood event,sq km or as reported,float or string,ASDMA/district reports,as reported by source,empty cell = not reported
+affected_population,Population affected by the flood event,count,integer,ASDMA/district reports,as reported by source,empty cell = not reported
+severity_information,Free-text severity description from the source,n/a,string,ASDMA/district reports,as reported by source,empty cell = not reported
+primary_source,Primary citation for the event record,n/a,string,n/a,n/a,required for every event row
+secondary_source,Secondary/corroborating citation for the event record,n/a,string,n/a,n/a,empty if no secondary source found
+source_reference,URL or document reference for the source,n/a,string,n/a,n/a,required for every event row
+flood_next_6h,Binary target: validated flood occurs within 6h after timestamp,0 or 1,integer,calculated from flood_events.csv,1 if any flood_events row has flood_start within (t, t+6h],n/a - must be derivable; row excluded from training if not computable
+flood_next_12h,Binary target: validated flood occurs within 12h after timestamp,0 or 1,integer,calculated from flood_events.csv,1 if any flood_events row has flood_start within (t, t+12h],n/a - must be derivable; row excluded from training if not computable
+flood_next_24h,Binary target: validated flood occurs within 24h after timestamp,0 or 1,integer,calculated from flood_events.csv,1 if any flood_events row has flood_start within (t, t+24h],n/a - must be derivable; row excluded from training if not computable
+data_source,Name/identifier of the originating data source for this row,n/a,string,n/a,n/a,required for every row
+source_station,Originating station/gauge identifier,n/a,string,n/a,n/a,empty if not applicable
+quality_flag,Data quality indicator (e.g. observed/estimated/flagged),categorical,string,n/a,assigned during ingestion,defaults to 'unverified' if not explicitly set
+missing_flag,Explicit flag marking a value as missing (vs. legitimately zero),boolean,boolean,n/a,set during ingestion,n/a
+derived_flag,Marks whether a value is directly observed (false) or derived/modeled (true),boolean,boolean,n/a,set during ingestion,n/a

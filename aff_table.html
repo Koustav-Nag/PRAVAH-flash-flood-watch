@@ -1,0 +1,841 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" defer></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js" defer></script>
+
+<style>
+:root {
+  --brand-blue: #0B5ED7;
+  --muted-bg: #f7f8fb;
+  --content-max-width: 1100px;
+}
+
+html, body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--muted-bg);
+  color: #222;
+}
+
+/* Header */
+.site-header {
+  background: linear-gradient(90deg, var(--brand-blue), #0a63b8);
+  color: #fff;
+  padding: .35rem 0;
+}
+
+.site-header img {
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+.site-header,.nav-bg {
+  overflow-x: clip;   /* modern & safer than hidden */
+}
+
+
+
+.scroll-x {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-container,
+.content-wrap {
+  max-width: 100%;
+  overflow-x: visible;
+}
+
+
+
+.logo-img {
+  height: 42px;
+  width: auto;
+}
+
+/* Ticker */
+.ticker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.ticker {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.ticker__move {
+  white-space: nowrap;              /* 🔑 prevents line breaks */
+  display: inline-block;
+  padding-left: 100%;
+  animation: ticker 18s linear infinite;
+  font-weight: 700;
+  font-size: .95rem;
+  will-change: transform;
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+
+
+
+
+/* Navigation */
+.nav-bg {
+  background: #fff;
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.nav .nav-link {
+  color: #333;
+}
+
+.nav .nav-link.active {
+  font-weight: 600;
+  color: var(--brand-blue);
+}
+
+/* Page content wrapper */
+.page-container {
+  padding: 0.5rem 0.75rem;
+}
+
+.content-wrap {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+/* Images */
+img.resp {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #e8e8ee;
+  padding: .25rem;
+  background: #fff;
+  border-radius: 6px;
+}
+
+/* Justified text */
+.page-container p {
+   text-align: justify;
+  text-justify: inter-word;
+  word-spacing: normal;
+}
+
+
+.logo-wrap {
+  flex: 0 0 auto;      /* 🔑 do not shrink */
+  min-width: 42px;     /* guarantees visibility */
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile offcanvas width override */
+.offcanvas-start {
+  --bs-offcanvas-width: 250px;   /* adjust as needed */
+}
+
+.offcanvas {
+  background: linear-gradient(180deg,#f7fbff,#eef4ff,#fff);
+}
+
+.offcanvas-header {background: linear-gradient(
+    90deg,#0B5ED7,#0a63b8);
+  color: #fff;
+}
+
+.offcanvas-header .btn-close {
+  filter: invert(1);   /* makes close icon white */
+}
+.offcanvas .nav-link {
+  color: #0b3d91;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.offcanvas .nav-link:hover,
+.offcanvas .nav-link.active {
+  background: rgba(11, 94, 215, 0.1);
+  color: #0B5ED7;
+}
+
+.offcanvas hr {
+  border-color: rgba(0,0,0,0.1);
+}
+
+.offcanvas .small {
+  color: #555;
+}
+
+.info-box a {
+  text-decoration: none;
+  color: #0B5ED7;
+}
+.info-box a:hover {
+  text-decoration: underline;
+}
+
+.info-box {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+/* Mobile */
+@media (max-width: 420px) {
+  .logo-img { height: 36px; }
+  .ticker__move { font-size: .9rem; animation-duration: 20s; }
+}
+
+@media (max-width: 420px) {
+  .site-header .d-flex {
+    gap: .25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .ticker-wrap {
+    flex: 1 1 auto;
+    min-width: 0;      /* allows ticker to shrink instead */
+  }
+  
+  .logo-wrap {
+    min-width: 34px;     /* reduce from 42px */
+    padding-right: 0;   /* remove any residual spacing */
+    padding-left: 0;
+  }
+  
+  .site-header .container-fluid {
+    padding-left: .25rem;
+    padding-right: .25rem;
+  }
+  
+   .logo-wrap:first-child {
+    margin-right: .25rem;
+  }
+  .logo-wrap:last-child {
+    margin-left: .25rem;
+  }
+  
+  
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container-fluid">
+    <div class="d-flex align-items-center justify-content-between">
+		<!-- Mobile hamburger -->
+	<button class="btn btn-link d-md-none me-2"
+		data-bs-toggle="offcanvas"
+		data-bs-target="#mobileNav"
+		aria-label="Open navigation">
+	☰
+	</button>
+	
+	
+	
+	  <div class="logo-wrap">
+        <img src="/images/emblem.png" alt="CWC Emblem" class="logo-img">
+	</div>
+	
+     
+      <div class="flex-fill text-center ticker-wrap">
+        <div class="ticker">
+          <div class="ticker__move">
+            CENTRAL WATER COMMISSION - ADVISORY FLOOD FORECAST
+          </div>
+        </div>
+      </div>
+
+      
+		<div class="logo-wrap text-end">
+			<img src="/images/cwclogo.gif" alt="CWC Logo" class="logo-img">
+		</div>
+
+    </div>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav class="nav-bg">
+	<div class="container-fluid">
+		<div class="d-flex align-items-center py-1">
+			<!-- Navigation -->
+			<div class="collapse d-md-flex flex-grow-1" id="mainNav">
+				<ul class="nav nav-pills flex-column flex-md-row">
+
+					<li class="nav-item"><a class="nav-link" href="home.php">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="inundation.php">Inundation</a></li>
+					<li class="nav-item"><a class="nav-link" href="method.php">Methodology</a></li>
+					<li class="nav-item"><a class="nav-link" href="hydro.php">Forecast-Hydrograph</a></li>
+					<li class="nav-item"><a class="nav-link" href="table.php">Tabular-View</a></li>
+					<li class="nav-item"><a class="nav-link" href="contact.php">Contact Us</a></li>
+					<li class="nav-item"><a class="nav-link" href="otherportal.php">Other Forecast Portals</a></li>
+					
+					<!-- Mobile-only info -->
+					<li class="nav-item d-md-none mt-2 pt-2 border-top small text-muted">
+					<div>Last model run: 2026-09-23 21:45</div>
+										</li>
+
+				</ul>
+			</div>
+
+			<!-- Desktop-only info (right aligned) -->
+			<div class="ms-auto d-none d-md-flex align-items-center gap-3 small text-muted">
+				<div>Last model run: 2026-09-23 21:45</div>
+					
+			</div>
+
+		</div>
+	</div>
+
+
+</nav>
+<!-- Mobile Left-Side Navigation (Offcanvas) -->
+<div class="offcanvas offcanvas-start d-md-none"
+     tabindex="-1"
+     id="mobileNav"
+     aria-labelledby="mobileNavLabel">
+
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileNavLabel">Menu</h5>
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <ul class="nav flex-column nav-pills gap-1">
+      <li class="nav-item"><a class="nav-link" href="home.php">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="inundation.php">Inundation</a></li>
+      <li class="nav-item"><a class="nav-link" href="method.php">Methodology</a></li>
+      <li class="nav-item"><a class="nav-link" href="hydro.php">Forecast-Hydrograph</a></li>
+      <li class="nav-item"><a class="nav-link" href="table.php">Tabular-View</a></li>
+      <li class="nav-item"><a class="nav-link" href="contact.php">Contact Us</a></li>
+	  <li class="nav-item"><a class="nav-link" href="otherportal.php">Other Forecast Portals</a></li>
+					
+				
+		
+		
+    </ul>
+
+    <hr>
+
+    <div class="small text-muted">
+      Last model run: 2026-09-23 21:45<br>
+      
+		  
+    </div>
+  </div>
+</div><script>document.title = "Tabular View - CWC AFF";</script>
+
+<style>
+/* Page container - use full viewport width inside site container */
+.page-wrap {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Table containers - remove side margins so table takes full width */
+.table-box {
+    background: #ffffff;            /* white */
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+}
+
+/* Table styling - full width */
+.table-grid {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1200px;
+    font-size: 13px;
+}
+
+.table-grid th,
+.table-grid td {
+    padding: 8px 10px;
+    border: 1px solid #edf2f7;       /* light gray-blue */
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-grid th {
+    position: sticky;
+    top: 0;
+    background: #f7fafc;             /* very light gray */
+    z-index: 2;
+    font-weight: 700;
+    text-align: center;
+}
+
+.table-grid tr:nth-child(even) {
+    background: #fbfdff;             /* very pale blue */
+}
+
+.table-grid tr:hover {
+    background: #f1f5f9;             /* light gray-blue */
+}
+
+/* Left-align specific metadata columns */
+.left-align {
+    text-align: left !important;
+    padding-left: 12px !important;
+}
+
+/* Color classes for forecast text */
+.fc-above {
+    background: #FFF59D;             /* light yellow */
+}
+
+.fc-severe {
+    background: #FFB74D;             /* orange */
+}
+
+.fc-extreme {
+    background: #EF5350;             /* red */
+    color: #ffffff;                  /* white */
+}
+
+/* Numeric coloring (inflow) */
+.inflow-low {
+    background: #FFF59D;             /* light yellow */
+}
+
+.inflow-medium {
+    background: #FFC1E3;             /* pink */
+}
+
+.inflow-high {
+    background: #FFB74D;             /* orange */
+}
+
+.inflow-extreme {
+    background: #EF5350;             /* red */
+    color: #ffffff;                  /* white */
+}
+
+/* Disclaimer bar full width (keeps site padding outside) */
+#disclaimer-bar {
+    margin-top: 8px;
+    background: #fff8f0;             /* very light peach */
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ffedd5;       /* light peach */
+    font-size: 13px;
+}
+
+/* Visitor counter */
+#counter {
+    text-align: center;
+    color: green;                    /* green */
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .table-grid {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 700px) {
+    .table-grid {
+        min-width: 700px;
+        font-size: 12px;
+    }
+}
+</style>
+
+
+<div class="page-wrap">
+  <div id="Flood">
+    <div style="text-align:center; font-weight:700; color:#c62828; margin:12px 0;">
+      <b>Details of likely Flood condition at various gauging stations of CWC</b>
+    </div>
+
+    <div class="table-box" style="overflow-x:auto;">
+      <!-- SINGLE table with two header rows: grouping row (colspans) + column header row -->
+      <table class="table-grid" id="Flood1" role="table" aria-label="Flood forecast table">
+        <thead>
+          <!-- Grouping header: Day blocks -->
+          <tr style="text-align:center; font-weight:bold;">
+            <th colspan="2" style="background-color:#ABEBC6;">CWC<br>Stations</th>
+            <th colspan="4" style="background-color:#ABEBC6;">Station Details</th>
+
+            <th colspan="3" style="background-color:#F9E79F;">Short-Range<br>Forecast</th>
+
+            <th colspan="3" style="background-color:#85C1E9;">Day-1<br>Forecast</th>
+            <th colspan="3" style="background-color:#F9E79F;">Day-2<br>Forecast</th>
+            <th colspan="3" style="background-color:#85C1E9;">Day-3<br>Forecast</th>
+            <th colspan="3" style="background-color:#F9E79F;">Day-4<br>Forecast</th>
+            <th colspan="3" style="background-color:#85C1E9;">Day-5<br>Forecast</th>
+            <th colspan="3" style="background-color:#F9E79F;">Day-6<br>Forecast</th>
+            <th colspan="3" style="background-color:#85C1E9;">Day-7<br>Forecast</th>
+          </tr>
+
+          <!-- Actual column headers -->
+          <tr>
+            <th>S.No</th>
+            <th class="left-align">Site name</th>
+            <th class="left-align">River</th>
+            <th class="left-align">District</th>
+            <th class="left-align">State</th>
+            <th class="left-align">WL;DL;HFL</th>
+
+            <th>Date Time</th><th>Flood condition</th><th>Forecast WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+            <th>Date Time</th><th>Flood condition</th><th>Max WL</th>
+          </tr>
+        </thead>
+
+        <tbody id="Flood1Body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Inflow section: same approach -->
+  <div id="Inflow" style="margin-top:14px;">
+    <div style="text-align:center; font-weight:700; color:#c62828; margin:12px 0;">
+      <b>Details of likely Inflows to various reservoirs</b>
+    </div>
+
+    <div class="table-box" style="overflow-x:auto;">
+      <table class="table-grid" id="Inflow1" role="table" aria-label="Inflow forecast table">
+        <thead>
+          <!-- Grouping header -->
+          <tr style="text-align:center; font-weight:bold;">
+            <th colspan="2" style="background-color:#ABEBC6;">CWC Inflow<br>Stations</th>
+            <th colspan="6" style="background-color:#ABEBC6;">Reservoir<br>Characteristics</th>
+
+            <th colspan="2" style="background-color:#F9E79F;">Short-Range<br>Forecast</th>
+
+            <th colspan="2" style="background-color:#85C1E9;">Day-1<br>Forecast</th>
+            <th colspan="2" style="background-color:#F9E79F;">Day-2<br>Forecast</th>
+            <th colspan="2" style="background-color:#85C1E9;">Day-3<br>Forecast</th>
+            <th colspan="2" style="background-color:#F9E79F;">Day-4<br>Forecast</th>
+            <th colspan="2" style="background-color:#85C1E9;">Day-5<br>Forecast</th>
+            <th colspan="2" style="background-color:#F9E79F;">Day-6<br>Forecast</th>
+            <th colspan="2" style="background-color:#85C1E9;">Day-7<br>Forecast</th>
+          </tr>
+
+          <!-- Column headers -->
+          <tr>
+            <th>S.No</th>
+            <th class="left-align">Reservoir name</th>
+            <th class="left-align">River</th>
+            <th class="left-align">District</th>
+            <th class="left-align">State</th>
+            <th class="left-align">GS (MCM)</th>
+            <th class="left-align">MDDL (m)</th>
+            <th class="left-align">FRL (m)</th>
+
+            <th>Date Time</th><th>Inflow (cumec)</th>
+			
+            <th>Date Time</th><th>Inflow (MCM)</th>
+            <th>Date Time</th><th>Inflow (MCM)</th>
+            <th>Date Time</th><th>Inflow (MCM)</th>
+            <th>Date Time</th><th>Inflow (MCM)</th>
+            <th>Date Time</th><th>Inflow (MCM)</th>
+            <th>Date Time</th><th>Inflow (MCM)</th>
+			<th>Date Time</th><th>Inflow (MCM)</th>
+          </tr>
+        </thead>
+
+        <tbody id="Inflow1Body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Disclaimer & counter unchanged... -->
+
+
+  <!-- Disclaimer -->
+  <div id="disclaimer-bar" role="note">
+    <strong>Disclaimer:</strong>
+    <ol style="margin:6px 0 0 18px; padding:0;">
+      <li>The purpose of this web portal is to sensitize all the stakeholders about Flood Situation in the country on real-time.</li>
+      <li>Flood Forecast may be subject to uncertainty in rainfall forecast, lack of information on reservoir releases, Drainage congestion, measurement process during floods and other unknown factors.</li>
+      <li>Department has no responsibility or liability for any errors or omissions in the content of this web portal.</li>
+      <li>For further queries, the Flood Control Room of Central Water Commission shall be contacted at E-mail: fmdte@nic.in.</li>
+      <li>Background map does not depict political boundary.</li>
+      <li>Flood Forecast is updated every 3 hours. So in case of Flood like situation, it is advisable to view the Flood Forecast regularly.</li>
+    </ol>
+  </div>
+
+  <div id="counter">
+    You are visitor no: 1418  </div>
+</div>
+
+<script>
+
+/* Split CSV line respecting quoted values */
+function splitCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
+/* parse CSV-like text robustly (handles quoted commas) */
+function parsePlainCSV(text) {
+  const cleaned = text.replace(/\r/g, '');
+  const lines = cleaned.trim().split('\n').filter(l => l.trim() !== '');
+  if (lines.length === 0) return { headers: [], rows: [] };
+
+  const headers = splitCSVLine(lines[0]);
+
+  const rows = lines.slice(1).map(line => {
+    const values = splitCSVLine(line);
+    const obj = {};
+
+    headers.forEach((h, i) => {
+      let v = values[i] !== undefined ? values[i].trim() : '';
+      if (v === 'undefined' || v === 'NaN') v = '';
+      obj[h] = v;
+    });
+
+    return obj;
+  });
+
+  return { headers, rows };
+}
+
+
+
+
+
+
+
+/* parse CSV-like text robustly */
+function parsePlainCSV_old(text) {
+  const cleaned = text.replace(/\r/g, '');
+  const lines = cleaned.trim().split('\n').filter(l => l.trim() !== '');
+  if (lines.length === 0) 
+	  return { headers: [], rows: [] };
+  const headers = lines[0].split(',').map(h => h.trim());
+  const rows = lines.slice(1).map(line => {
+    const values = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => {
+      let v = (values[i] === undefined) ? '' : values[i].trim();
+      if (v === 'undefined' || v === 'NaN') v = '';
+      obj[h] = v;
+    });
+    return obj;
+  });
+  return { headers, rows };
+}
+
+/* Flood coloring for textual conditions */
+function applyFloodCellColor(td, text) {
+  const t = (text || '').trim().toLowerCase();
+  if (!t) return;
+  if (t.includes('above normal') || t.includes('above')) td.classList.add('fc-above');
+  else if (t.includes('severe')) td.classList.add('fc-severe');
+  else if (t.includes('extreme')) td.classList.add('fc-extreme');
+}
+
+/* Inflow numeric coloring: only apply when cell contains a parsable number */
+function applyInflowColor(td, text) {
+  if (!text) return;
+  // remove commas, percent signs etc
+  const cleaned = (text + '').replace(/[, %]/g, '').trim();
+  // if it looks like a date (contains / or - or ":" or letters), don't color
+  const looksLikeDate = /[A-Za-z]|\/|-|:/.test(cleaned);
+  // parse number
+  const num = parseFloat(cleaned);
+  if (looksLikeDate || Number.isNaN(num)) return; // skip coloring for date or non-number
+
+  if (num >= 500) td.classList.add('inflow-extreme');
+  else if (num >= 350) td.classList.add('inflow-high');
+  else if (num >= 200) td.classList.add('inflow-medium');
+  else if (num >= 50) td.classList.add('inflow-low');
+}
+
+/* Fetch and populate Flood table */
+async function fetchFloodData() {
+  try {
+    const resp = await fetch('/textdata/Floodday_table_view_header.txt?t=' + Date.now());
+    if (!resp.ok) throw new Error('Failed to load Flood data');
+    const text = await resp.text();
+    const parsed = parsePlainCSV(text);
+    const rows = parsed.rows;
+    const tbody = document.getElementById('Flood1Body');
+    tbody.innerHTML = '';
+
+    rows.forEach((row, i) => {
+      const tr = document.createElement('tr');
+
+      // Order of fields kept same as original
+      const cells = [
+        i+1,
+        row['Station'] || '',
+        row['River'] || '',
+        row['District'] || '',
+        row['State'] || '',
+        row['combined_wl_dl_hfl'] || '',
+        row['forecasted_date_ffs'] || '',
+        row['ffs_condition'] || '',
+        row['forecast_value_ffs'] || '',
+        row['ForecastDate1'] || '',
+        row['ConditionDay1'] || '',
+        row['ForecastDay1'] || '',
+        row['ForecastDate2'] || '',
+        row['ConditionDay2'] || '',
+        row['ForecastDay2'] || '',
+        row['ForecastDate3'] || '',
+        row['ConditionDay3'] || '',
+        row['ForecastDay3'] || '',
+        row['ForecastDate4'] || '',
+        row['ConditionDay4'] || '',
+        row['ForecastDay4'] || '',
+        row['ForecastDate5'] || '',
+        row['ConditionDay5'] || '',
+        row['ForecastDay5'] || '',
+        row['ForecastDate6'] || '',
+        row['ConditionDay6'] || '',
+        row['ForecastDay6'] || '',
+        row['ForecastDate7'] || '',
+        row['ConditionDay7'] || '',
+        row['ForecastDay7'] || ''
+      ];
+
+      cells.forEach((c, idx) => {
+        const td = document.createElement('td');
+        td.textContent = c;
+        // left-align specific metadata columns (indexes 1..5)
+        if (idx >= 1 && idx <= 5) td.classList.add('left-align');
+        tr.appendChild(td);
+
+        // textual conditions coloring (these are condition columns at 7,10,13,16,19,22,25,28 -> 0-based)
+        if ([7,10,13,16,19,22,25,28].includes(idx)) applyFloodCellColor(td, c);
+      });
+
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error('Flood load failed', err);
+    document.getElementById('Flood1Body').innerHTML = '<tr><td colspan="31">Error loading flood data.</td></tr>';
+  }
+}
+
+/* Fetch and populate Inflow table */
+async function loadInflowTable() {
+  try {
+    const resp = await fetch('/textdata/Inflowday_table_view_header.txt?t=' + Date.now());
+    if (!resp.ok) throw new Error('Failed to load Inflow data');
+    const text = await resp.text();
+    const parsed = parsePlainCSV(text);
+    const rows = parsed.rows;
+    const tbody = document.getElementById('Inflow1Body');
+    tbody.innerHTML = '';
+
+    rows.forEach((row, i) => {
+      const tr = document.createElement('tr');
+
+      const cells = [
+        i+1,
+        row['Station'] || '',
+        row['River'] || '',
+        row['District'] || '',
+        row['State'] || '',
+        row['GrossSTR'] || '',
+        row['MDDL'] || '',
+        row['FRL'] || '',
+        row['forecasted_date_ffs'] || '',
+        row['forecast_value_ffs'] || '',
+        row['ForecastDate1'] || '',
+        row['ForecastDay1'] || '',
+        row['ForecastDate2'] || '',
+        row['ForecastDay2'] || '',
+        row['ForecastDate3'] || '',
+        row['ForecastDay3'] || '',
+        row['ForecastDate4'] || '',
+        row['ForecastDay4'] || '',
+        row['ForecastDate5'] || '',
+        row['ForecastDay5'] || '',
+        row['ForecastDate6'] || '',
+        row['ForecastDay6'] || '',
+        row['ForecastDate7'] || '',
+        row['ForecastDay7'] || ''
+      ];
+
+      cells.forEach((c, idx) => {
+        const td = document.createElement('td');
+        td.textContent = c;
+        // left-align metadata columns
+        if (idx >= 1 && idx <= 7) td.classList.add('left-align');
+        tr.appendChild(td);
+
+        // Apply numeric coloring only when the cell looks numeric (skip dates)
+        // For inflow we assume numeric values appear after column index 8 (0-based)
+        if (idx >= 9) applyInflowColor(td, c);
+      });
+
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error('Inflow load failed', err);
+    document.getElementById('Inflow1Body').innerHTML = '<tr><td colspan="24">Error loading inflow data.</td></tr>';
+  }
+}
+
+/* Init */
+document.addEventListener('DOMContentLoaded', function() {
+  fetchFloodData();
+  loadInflowTable();
+});
+</script>

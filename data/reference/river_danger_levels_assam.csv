@@ -1,0 +1,27 @@
+river,gauge_location,district,danger_level_m,hfl_m,hfl_date
+Brahmaputra,Dibrugarh,Dibrugarh,105.70,106.48,1998-09-03
+Brahmaputra,Neamatighat,Jorhat,85.04,87.37,1991-07-11
+Brahmaputra,Tezpur,Sonitpur,65.23,66.59,1988-08-27
+Brahmaputra,Guwahati D.C. Court,Kamrup,49.68,51.46,2004-07-21
+Brahmaputra,Goalpara,Goalpara,36.27,37.43,1954-07-01
+Brahmaputra,Dhubri,Dhubri,28.62,30.36,1988-08-29
+Gai Nadi,NH-52 RCC Bridge,Dhemaji,108.20,111.75,2011-08-15
+Jiadhal,Ch.6400m,Dhemaji,110.39,112.09,2011-08-15
+Burhidihing,Naharkatia,Dibrugarh,120.40,122.69,1973-06-17
+Burhidihing,Khowang,Dibrugarh,102.11,103.92,1988-08-25
+Subansiri,Badatighat,North Lakhimpur,82.53,86.84,1972-01-01
+Dekhow,Sibsagar,Sibsagar,92.40,95.62,1974-01-01
+Desang,Nanglamaraghat,Sibsagar,94.46,96.49,1998-09-06
+Dhansiri(s),Golaghat,Golaghat,89.50,91.30,1986-10-11
+Jia Bharali,N.T.Road Xing,Sonitpur,77.00,78.50,2007-07-26
+Kopili,Kampur,Nagaon,60.50,61.86,1973-01-01
+Kopili,Dharamtul,Morigaon,56.00,58.09,2004-01-01
+Puthimari,N.H Road Xing,Kamrup,51.81,55.08,1908-08-31
+Pagladiya,N.T.Road Xing,Nalbari,52.75,55.45,2004-07-08
+Manas,N.H Road Xing,Kokrajhar,48.42,50.08,1984-01-01
+Beki,Road Bridge,Barpeta,45.10,46.20,2000-08-04
+Barak,A.P. Ghat,Cachar,19.83,21.84,1989-08-01
+Katakhal,Matizuri,Cachar,20.27,22.73,2007-09-10
+Kushiyara,Karimganj,Karimganj,14.94,16.54,2007-09-12
+Ranga Nadi,Railway Bridge Cross,Lakhimpur,95.02,96.84,2008-06-04
+Dikrong,Sisapathar,Lakhimpur,86.60,89.07,1989-06-12
