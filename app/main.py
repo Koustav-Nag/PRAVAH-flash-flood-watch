@@ -58,6 +58,18 @@ def load_model_on_startup() -> None:
     xgb_model.load()  # no-op / warns if no saved model exists yet
 
 
+@app.get("/")
+@app.head("/")
+def root():
+    return {
+        "status": "ok",
+        "app": settings.APP_NAME,
+        "region": settings.REGION_NAME,
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
 @app.get("/health")
 def health_check():
     return {
