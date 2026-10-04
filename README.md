@@ -7,7 +7,7 @@
 ![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)
 ![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-FF6600)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
 
