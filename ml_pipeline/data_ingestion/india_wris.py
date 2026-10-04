@@ -165,7 +165,7 @@ def fetch_cwc_aff_table(force_refresh: bool = False) -> dict[str, dict[str, Any]
 
     url = getattr(settings, "CWC_AFF_TABLE_URL", "https://aff.india-water.gov.in/textdata/Floodday_table_view_header.txt")
     try:
-        resp = httpx.get(url, timeout=6.0, verify=False)
+        resp = httpx.get(url, timeout=30.0, verify=False)
         resp.raise_for_status()
         lines = [l.strip() for l in resp.text.splitlines() if l.strip()]
         if not lines:
@@ -195,7 +195,7 @@ def fetch_cwc_aff_timeseries(cwc_station_name: str) -> list[dict[str, Any]]:
     encoded = urllib.parse.quote(cwc_station_name)
     url = f"{base_url}/{encoded}-W.txt"
     try:
-        resp = httpx.get(url, timeout=6.0, verify=False)
+        resp = httpx.get(url, timeout=30.0, verify=False)
         resp.raise_for_status()
         lines = [l.strip() for l in resp.text.splitlines() if l.strip()]
         if len(lines) < 2:
