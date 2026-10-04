@@ -126,7 +126,7 @@ def is_cwc_aff_available() -> bool:
 
     url = getattr(settings, "CWC_AFF_TABLE_URL", "https://aff.india-water.gov.in/textdata/Floodday_table_view_header.txt")
     try:
-        resp = httpx.get(url, timeout=4.0, verify=False)
+        resp = httpx.get(url, timeout=30.0, verify=False)
         _cwc_aff_available = resp.status_code == 200 and len(resp.text) > 1000
     except Exception as exc:
         logger.info(f"CWC AFF live portal not reachable ({exc}). Falling back to simulated/mock data.")
