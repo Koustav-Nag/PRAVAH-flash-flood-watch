@@ -113,7 +113,7 @@ Every data-ingestion module has a **mock fallback**, so the entire pipeline runs
 ## 📂 Project Structure
 
 ```
-flash-flood-sih/
+PRAVAH-flash-flood-watch/
 ├── app/                              # FastAPI backend application
 │   ├── main.py                       # API entrypoint with all route handlers
 │   ├── core/
@@ -226,8 +226,8 @@ flash-flood-sih/
 
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/flash-flood-sih.git
-cd flash-flood-sih
+git clone https://github.com/Koustav-Nag/PRAVAH-flash-flood-watch.git
+cd PRAVAH-flash-flood-watch
 
 # Install Python dependencies
 pip install -r requirements.txt
