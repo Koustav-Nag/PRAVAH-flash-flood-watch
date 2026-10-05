@@ -1,6 +1,6 @@
 # 🌊 Flash Flood Prediction & Early Warning System
 
-> **SIH 2026 Prototype** — Real-time flash flood risk assessment, forecasting, and evacuation guidance for Sonitpur District, Assam.
+> Real-time flash flood risk assessment, forecasting, and evacuation guidance for Sonitpur District, Assam.
 
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
