@@ -7,8 +7,13 @@ Run with:
 
 from __future__ import annotations
 
+import asyncio
+import logging
+import os
+from contextlib import asynccontextmanager
 from datetime import datetime
 
+import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -35,10 +40,79 @@ from ml_pipeline.risk_engine.hybrid import compute_hybrid_risk
 from ml_pipeline.safe_place_engine.registry import load_shelters
 from ml_pipeline.safe_place_engine.safe_place import recommend_safe_place
 
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("pravah.api")
+
+# Loaded once at startup; stays untrained (physics-only fallback) until
+# a training dataset exists and train.py has been run.
+xgb_model = FlashFloodXGBModel()
+
+# ---------------------------------------------------------------------------
+# Self-ping keep-alive (prevents Render free-tier cold start)
+# ---------------------------------------------------------------------------
+# Render spins down free services after ~15 min of inactivity.
+# This background task pings /ping every 13 min to keep it warm.
+# Set RENDER_EXTERNAL_URL in your Render environment, or SELF_PING_URL
+# in .env.  Disabled when neither is set (e.g. local dev).
+
+SELF_PING_INTERVAL_SECONDS = int(os.getenv("SELF_PING_INTERVAL", "780"))  # 13 min
+SELF_PING_URL: str | None = os.getenv(
+    "SELF_PING_URL",
+    os.getenv("RENDER_EXTERNAL_URL"),  # Render sets this automatically
+)
+
+
+async def _self_ping_loop() -> None:
+    """Periodically hit our own /ping endpoint to prevent cold starts."""
+    if not SELF_PING_URL:
+        logger.info("Self-ping disabled (RENDER_EXTERNAL_URL / SELF_PING_URL not set)")
+        return
+
+    url = f"{SELF_PING_URL.rstrip('/')}/ping"
+    logger.info("Self-ping enabled → %s every %ds", url, SELF_PING_INTERVAL_SECONDS)
+
+    async with httpx.AsyncClient(timeout=10) as client:
+        while True:
+            await asyncio.sleep(SELF_PING_INTERVAL_SECONDS)
+            try:
+                resp = await client.get(url)
+                logger.info("Self-ping → %s  %d", url, resp.status_code)
+            except Exception:
+                logger.warning("Self-ping failed for %s", url, exc_info=True)
+
+
+# ---------------------------------------------------------------------------
+# Lifespan (replaces deprecated @app.on_event)
+# ---------------------------------------------------------------------------
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup: load model + launch keep-alive.  Shutdown: cancel task."""
+    # --- startup ---
+    xgb_model.load()  # no-op / warns if no saved model exists yet
+    logger.info("Model initialization completed; trained=%s", xgb_model.is_trained())
+
+    ping_task = asyncio.create_task(_self_ping_loop())
+
+    yield
+
+    # --- shutdown ---
+    ping_task.cancel()
+    try:
+        await ping_task
+    except asyncio.CancelledError:
+        pass
+
+
 app = FastAPI(
     title=settings.APP_NAME,
     description="Multi-source flash-flood early-warning prototype — Sonitpur, Assam pilot",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -47,16 +121,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Loaded once at startup; stays untrained (physics-only fallback) until
-# a training dataset exists and train.py has been run.
-xgb_model = FlashFloodXGBModel()
-
-
-@app.on_event("startup")
-def load_model_on_startup() -> None:
-    xgb_model.load()  # no-op / warns if no saved model exists yet
-
 
 @app.get("/")
 @app.head("/")
