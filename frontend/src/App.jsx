@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Suspense, lazy } from "react";
 import RiskGauge from "./components/RiskGauge.jsx";
 import ComponentBreakdown from "./components/ComponentBreakdown.jsx";
-import RegionMap from "./components/RegionMap.jsx";
 import SafePlaceCard from "./components/SafePlaceCard.jsx";
-import RainfallTrend from "./components/RainfallTrend.jsx";
 import DataSourcesPanel from "./components/DataSourcesPanel.jsx";
 import TerrainPanel from "./components/TerrainPanel.jsx";
 import RiverStatusPanel from "./components/RiverStatusPanel.jsx";
 import ForecastTimeline from "./components/ForecastTimeline.jsx";
+
+// Lazy-load the two heaviest components (they pull in leaflet ~250KB + recharts ~300KB)
+const RegionMap = lazy(() => import("./components/RegionMap.jsx"));
+const RainfallTrend = lazy(() => import("./components/RainfallTrend.jsx"));
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -257,14 +259,16 @@ export default function App() {
             Region overview <span className="hint">Sonitpur district, Assam</span>
           </h2>
           <div className="panel map-panel">
-            <RegionMap
-              bounds={bounds}
-              origin={dispatch?.origin || { latitude: lat, longitude: lon }}
-              safePlace={dispatch?.safe_place}
-              shelters={shelters}
-              riskCategory={category}
-              riverStatus={riverStatus}
-            />
+            <Suspense fallback={<div className="panel-loading">Loading map…</div>}>
+              <RegionMap
+                bounds={bounds}
+                origin={dispatch?.origin || { latitude: lat, longitude: lon }}
+                safePlace={dispatch?.safe_place}
+                shelters={shelters}
+                riskCategory={category}
+                riverStatus={riverStatus}
+              />
+            </Suspense>
             <div className="legend">
               <div className="legend-item">
                 <span className="legend-swatch" style={{ background: "var(--risk-low)" }} />
@@ -320,7 +324,9 @@ export default function App() {
               Rainfall <span className="hint">GPM/IMERG, last {RAINFALL_LOOKBACK_HOURS}h</span>
             </h2>
             <div className="panel">
-              <RainfallTrend points={rainfallSeries?.points} lookbackHours={RAINFALL_LOOKBACK_HOURS} />
+              <Suspense fallback={<div className="panel-loading">Loading chart…</div>}>
+                <RainfallTrend points={rainfallSeries?.points} lookbackHours={RAINFALL_LOOKBACK_HOURS} />
+              </Suspense>
             </div>
           </div>
 
